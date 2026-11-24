@@ -22,16 +22,26 @@ HDMI の抜き差しを udev で検知し、`xrandr --auto` でモニタの推�
 
 ## インストール
 
+[Releases](https://github.com/bellx2/hdmi-hotplug/releases) から最新版の `hdmi-hotplug.tar.gz` をダウンロードして展開し、インストールします。
+Raspberry Pi 上で次のコマンドを実行してください。
+
 ```sh
+curl -fsSL -o hdmi-hotplug.tar.gz https://github.com/bellx2/hdmi-hotplug/releases/latest/download/hdmi-hotplug.tar.gz
+tar xzf hdmi-hotplug.tar.gz
 cd hdmi-hotplug
 ./install.sh
 ```
+
+特定のバージョンを使う場合は、URL の `latest/download` を `download/<タグ>`（例: `download/v1.0.0`）に置き換えます。
 
 `sudo` 権限が必要です。再起動は不要で、インストール直後から有効になります。
 
 ## アンインストール
 
+インストール時に展開した `hdmi-hotplug` ディレクトリで実行します。
+
 ```sh
+cd hdmi-hotplug
 ./uninstall.sh
 ```
 
@@ -90,3 +100,13 @@ export XAUTHORITY=/home/pi/.Xauthority
 - X11 専用です。Wayland（labwc / wayfire）では `xrandr` が使えないため動作しません。
 - `sudo: unable to resolve host ...` という警告は `/etc/hosts` にホスト名がないために出るもので、
   動作には影響しません。消したい場合は `/etc/hosts` に `127.0.1.1 <ホスト名>` を追記してください。
+
+## リリース手順
+
+`v` で始まるタグを push すると、GitHub Actions（`.github/workflows/release.yml`）が
+`hdmi-hotplug.tar.gz` を作成し、GitHub Releases に公開します。
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```

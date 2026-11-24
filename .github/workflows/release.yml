@@ -1,0 +1,31 @@
+name: Release
+
+# v で始まるタグの push でリリースを作成する
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 展開すると hdmi-hotplug/ ディレクトリになるようにまとめる（実行権限は tar が保持する）
+      # releases/latest/download/ で取得できるよう、ファイル名にバージョンを含めない
+      - name: Build archive
+        run: |
+          mkdir -p dist/hdmi-hotplug
+          cp README.md hdmi-hotplug.sh 95-hdmi-hotplug.rules install.sh uninstall.sh dist/hdmi-hotplug/
+          tar -czf hdmi-hotplug.tar.gz -C dist hdmi-hotplug
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" hdmi-hotplug.tar.gz \
+            --title "$GITHUB_REF_NAME" --generate-notes
