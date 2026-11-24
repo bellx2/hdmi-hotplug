@@ -105,6 +105,8 @@ export XAUTHORITY=/home/pi/.Xauthority
 
 `v` で始まるタグを push すると、GitHub Actions（`.github/workflows/release.yml`）が
 `hdmi-hotplug.tar.gz` を作成し、GitHub Releases に公開します。
+リリースノートには `CHANGELOG.md` のタグと同じ見出し（例: `## [v1.0.0] - 2026-11-24`）の節が使われます。
+該当する節が無いとリリースは失敗するため、タグを付ける前に `CHANGELOG.md` へ追記してコミットしてください。
 
 ```sh
 git tag v1.0.0
