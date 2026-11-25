@@ -27,9 +27,12 @@ HDMI の抜き差しを udev で検知し、`xrandr --auto` でモニタの推�
 Raspberry Pi 上で次のコマンドを実行してください。
 
 ```sh
-curl -fsSLO https://github.com/bellx2/hdmi-hotplug/releases/latest/download/hdmi-hotplug_all.deb
-sudo apt install ./hdmi-hotplug_all.deb
+curl -fsSL -o /tmp/hdmi-hotplug_all.deb https://github.com/bellx2/hdmi-hotplug/releases/latest/download/hdmi-hotplug_all.deb
+sudo apt install /tmp/hdmi-hotplug_all.deb
 ```
+
+ホームディレクトリに置いた .deb を指定すると、apt が `_apt` ユーザーから読めないという `Notice` を表示します（動作には影響しません）。
+`/tmp` に置くとこの表示は出ません。
 
 依存パッケージ（`x11-xserver-utils` など）も自動でインストールされます。
 再起動は不要で、インストール直後から有効になります。
