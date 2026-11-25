@@ -6,9 +6,9 @@ HDMI の抜き差しを udev で検知し、`xrandr --auto` でモニタの推�
 
 ## 動作確認環境
 
-- Raspberry Pi Compute Module 4
-- Raspberry Pi OS (Debian 12 bookworm)
-- X11 / LXDE（lightdm で `pi` ユーザーが自動ログイン）
+- Raspberry Pi Compute Module 4 Rev 1.1
+- Raspberry Pi OS (Debian 13 trixie)
+- X11 / Raspberry Pi Desktop（`rpd-x` セッション、lightdm で `raspi` ユーザーが自動ログイン）
 - `vc4-kms-v3d` ドライバ
 
 ## ファイル構成
