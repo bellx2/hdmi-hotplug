@@ -8,9 +8,10 @@ rm -rf build
 install -D -m 755 hdmi-hotplug.sh "$ROOT/usr/bin/hdmi-hotplug"
 install -D -m 644 95-hdmi-hotplug.rules "$ROOT/lib/udev/rules.d/95-hdmi-hotplug.rules"
 install -D -m 644 hdmi-hotplug.default "$ROOT/etc/default/hdmi-hotplug"
+install -D -m 644 hdmi-hotplug.xsession "$ROOT/etc/X11/Xsession.d/95hdmi-hotplug"
 install -d "$ROOT/DEBIAN"
 sed "s/@VERSION@/$VERSION/" pkg/control > "$ROOT/DEBIAN/control"
 install -m 755 pkg/postinst pkg/postrm "$ROOT/DEBIAN/"
-echo /etc/default/hdmi-hotplug > "$ROOT/DEBIAN/conffiles"
+printf '%s\n' /etc/default/hdmi-hotplug /etc/X11/Xsession.d/95hdmi-hotplug > "$ROOT/DEBIAN/conffiles"
 # releases/latest/download/ で取得できるよう、ファイル名にバージョンを含めない
 dpkg-deb --root-owner-group --build "$ROOT" hdmi-hotplug_all.deb

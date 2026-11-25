@@ -1,6 +1,8 @@
 #!/bin/sh
 # HDMI hotplug: adapt X display to connected monitor's resolution
 
+ENV_XAUTHORITY=${XAUTHORITY:-}
+
 # 既定値。/etc/default/hdmi-hotplug で上書きする
 MODE=""
 RATE=""
@@ -18,7 +20,8 @@ detect_xauthority() {
   done
 }
 
-# 設定で指定されていなければ自動検出する
+# 設定 > 環境変数（X セッション開始時の実行で設定済み） > 自動検出 の順で決める
+[ -n "$XAUTHORITY" ] || XAUTHORITY=$ENV_XAUTHORITY
 if [ -z "$XAUTHORITY" ]; then
   XAUTHORITY=$(detect_xauthority)
   if [ -z "$XAUTHORITY" ]; then
@@ -30,7 +33,10 @@ export DISPLAY XAUTHORITY
 
 # 1 回の抜き差しで drm の複数デバイスから change イベントが届き同時に起動されるため、
 # 先に起動した 1 つだけ実行する。待機後に状態を読むので後発のイベントの変化も反映される
-exec 9>/run/lock/hdmi-hotplug.lock
+# root（udev）とログインユーザー（X セッション開始時）の両方から開けるよう、読み取りで開く
+LOCK=/run/lock/hdmi-hotplug.lock
+[ -e "$LOCK" ] || : >> "$LOCK"
+exec 9< "$LOCK"
 flock -n 9 || exit 0
 
 sleep 2   # wait for EDID to be readable

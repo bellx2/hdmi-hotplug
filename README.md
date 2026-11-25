@@ -18,6 +18,7 @@ HDMI の抜き差しを udev で検知し、`xrandr --auto` でモニタの推�
 | `hdmi-hotplug.sh` | 接続中の出力に `xrandr --auto` をかけて解像度を合わせる本体 | `/usr/bin/hdmi-hotplug` |
 | `95-hdmi-hotplug.rules` | DRM の change イベント（HDMI の抜き差し）を検知してスクリプトを実行する udev ルール | `/lib/udev/rules.d/` |
 | `hdmi-hotplug.default` | 設定ファイル（解像度・ディスプレイ） | `/etc/default/hdmi-hotplug` |
+| `hdmi-hotplug.xsession` | X セッション開始時に本体を一度実行するフック | `/etc/X11/Xsession.d/95hdmi-hotplug` |
 | `pkg/` | deb パッケージの control・postinst・postrm | - |
 | `build-deb.sh` | deb パッケージを作成するスクリプト | - |
 
@@ -63,6 +64,9 @@ sudo apt remove hdmi-hotplug   # 設定ファイルも消す場合は purge
    - 接続中の 1 台目を推奨解像度にして primary に設定する
    - 2 台目以降は 1 台目の右側に並べる
    - 外れた出力はオフにする
+5. モニタを接続したまま起動した場合は抜き差しのイベントが起きないため、
+   X セッション開始時に `/etc/X11/Xsession.d/95hdmi-hotplug` から一度実行し、起動時にも設定を反映します。
+   lightdm の既定の `session-wrapper=/etc/X11/Xsession` を使っている場合に動作します。
 
 ## 動作確認・ログ
 
@@ -79,7 +83,7 @@ DISPLAY=:0 xrandr | grep ' connected'
 
 ## カスタマイズ
 
-設定は `/etc/default/hdmi-hotplug` に書きます。変更は次回の HDMI 抜き差しから反映され、再インストールは不要です。
+設定は `/etc/default/hdmi-hotplug` に書きます。変更は次回の HDMI 抜き差しか再起動（再ログイン）から反映され、再インストールは不要です。
 
 ```sh
 sudo nano /etc/default/hdmi-hotplug
