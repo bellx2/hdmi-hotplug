@@ -5,6 +5,7 @@ MODE=""
 # リフレッシュレート（例: 60）。空なら指定なし。MODE が空のときは無視される
 RATE=""
 
-# xrandr を実行する X ディスプレイと、その認証ファイル
+# xrandr を実行する X ディスプレイ
 DISPLAY=:0
-XAUTHORITY=/home/pi/.Xauthority
+# X の認証ファイル。空なら DISPLAY のセッションのユーザーの ~/.Xauthority を自動で使う
+XAUTHORITY=""

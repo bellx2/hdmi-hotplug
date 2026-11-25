@@ -5,8 +5,27 @@
 MODE=""
 RATE=""
 DISPLAY=:0
-XAUTHORITY=/home/pi/.Xauthority
+XAUTHORITY=""
 [ -r /etc/default/hdmi-hotplug ] && . /etc/default/hdmi-hotplug
+
+# DISPLAY のセッションを持つユーザーの ~/.Xauthority を返す
+detect_xauthority() {
+  for s in $(loginctl list-sessions --no-legend | awk '{print $1}'); do
+    [ "$(loginctl show-session "$s" -p Display --value)" = "$DISPLAY" ] || continue
+    user=$(loginctl show-session "$s" -p Name --value)
+    home=$(getent passwd "$user" | cut -d: -f6)
+    [ -n "$home" ] && echo "$home/.Xauthority" && return
+  done
+}
+
+# 設定で指定されていなければ自動検出する
+if [ -z "$XAUTHORITY" ]; then
+  XAUTHORITY=$(detect_xauthority)
+  if [ -z "$XAUTHORITY" ]; then
+    logger -t hdmi-hotplug "no session found on DISPLAY=$DISPLAY; set XAUTHORITY in /etc/default/hdmi-hotplug"
+    exit 1
+  fi
+fi
 export DISPLAY XAUTHORITY
 
 sleep 2   # wait for EDID to be readable
