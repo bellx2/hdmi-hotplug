@@ -28,6 +28,11 @@ if [ -z "$XAUTHORITY" ]; then
 fi
 export DISPLAY XAUTHORITY
 
+# 1 回の抜き差しで drm の複数デバイスから change イベントが届き同時に起動されるため、
+# 先に起動した 1 つだけ実行する。待機後に状態を読むので後発のイベントの変化も反映される
+exec 9>/run/lock/hdmi-hotplug.lock
+flock -n 9 || exit 0
+
 sleep 2   # wait for EDID to be readable
 
 set_output() {
