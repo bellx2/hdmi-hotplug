@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = "configure" ]; then
+  # tar.gz 版（install.sh）の旧ファイルを削除する。/etc の同名ルールがパッケージのルールを上書きしてしまうため
+  if grep -qs /usr/local/bin/hdmi-hotplug.sh /etc/udev/rules.d/95-hdmi-hotplug.rules; then
+    rm -f /etc/udev/rules.d/95-hdmi-hotplug.rules
+  fi
+  rm -f /usr/local/bin/hdmi-hotplug.sh
+  udevadm control --reload-rules || true
+fi

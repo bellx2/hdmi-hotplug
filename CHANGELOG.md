@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.1.0] - 2026-11-25
+
+### 変更
+
+- 配布形式を deb パッケージ（`hdmi-hotplug_all.deb`）に変更し、`apt` でインストール・削除できるようにした
+- 設定（`MODE` / `RATE` / `DISPLAY` / `XAUTHORITY`）を `hdmi-hotplug.sh` から `/etc/default/hdmi-hotplug` に移した。パッケージを更新しても設定が残る
+- インストール先を `/usr/bin/hdmi-hotplug` と `/lib/udev/rules.d/` に変更した
+- tar.gz 版から移行すると、旧ファイル（`/usr/local/bin/hdmi-hotplug.sh`、`/etc/udev/rules.d/95-hdmi-hotplug.rules`）を自動で削除する
+
+### 削除
+
+- tar.gz での配布と `install.sh` / `uninstall.sh`
+
 ## [v1.0.1] - 2026-11-24
 
 ### 変更

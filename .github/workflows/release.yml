@@ -15,13 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 展開すると hdmi-hotplug/ ディレクトリになるようにまとめる（実行権限は tar が保持する）
-      # releases/latest/download/ で取得できるよう、ファイル名にバージョンを含めない
-      - name: Build archive
-        run: |
-          mkdir -p dist/hdmi-hotplug
-          cp README.md hdmi-hotplug.sh 95-hdmi-hotplug.rules install.sh uninstall.sh dist/hdmi-hotplug/
-          tar -czf hdmi-hotplug.tar.gz -C dist hdmi-hotplug
+      # タグ（v1.1.0）から先頭の v を除いた値をパッケージのバージョンにする
+      - name: Build deb
+        run: ./build-deb.sh "${GITHUB_REF_NAME#v}"
 
       # CHANGELOG.md からタグに対応する節（見出し行を除く）を取り出す。節が無ければ失敗させる
       - name: Extract release notes
@@ -40,5 +36,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" hdmi-hotplug.tar.gz \
+          gh release create "$GITHUB_REF_NAME" hdmi-hotplug_all.deb \
             --title "$GITHUB_REF_NAME" --notes-file notes.md

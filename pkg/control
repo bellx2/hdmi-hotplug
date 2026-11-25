@@ -1,0 +1,11 @@
+Package: hdmi-hotplug
+Version: @VERSION@
+Architecture: all
+Maintainer: Ryu Tanabe <bellx2@gmail.com>
+Depends: x11-xserver-utils, udev, systemd
+Section: x11
+Priority: optional
+Homepage: https://github.com/bellx2/hdmi-hotplug
+Description: Adapt X display resolution on HDMI hotplug
+ Detects HDMI connect/disconnect via udev and runs xrandr --auto
+ so that a monitor attached after boot gets its preferred resolution.

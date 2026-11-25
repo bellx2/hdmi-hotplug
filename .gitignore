@@ -16,3 +16,6 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
+### ビルド成果物
+build/
+*.deb

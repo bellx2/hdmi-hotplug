@@ -15,34 +15,38 @@ HDMI の抜き差しを udev で検知し、`xrandr --auto` でモニタの推�
 
 | ファイル | 内容 | インストール先 |
 |---|---|---|
-| `hdmi-hotplug.sh` | 接続中の出力に `xrandr --auto` をかけて解像度を合わせる本体 | `/usr/local/bin/` |
-| `95-hdmi-hotplug.rules` | DRM の change イベント（HDMI の抜き差し）を検知してスクリプトを実行する udev ルール | `/etc/udev/rules.d/` |
-| `install.sh` | インストールスクリプト | - |
-| `uninstall.sh` | アンインストールスクリプト | - |
+| `hdmi-hotplug.sh` | 接続中の出力に `xrandr --auto` をかけて解像度を合わせる本体 | `/usr/bin/hdmi-hotplug` |
+| `95-hdmi-hotplug.rules` | DRM の change イベント（HDMI の抜き差し）を検知してスクリプトを実行する udev ルール | `/lib/udev/rules.d/` |
+| `hdmi-hotplug.default` | 設定ファイル（解像度・ディスプレイ） | `/etc/default/hdmi-hotplug` |
+| `pkg/` | deb パッケージの control・postinst・postrm | - |
+| `build-deb.sh` | deb パッケージを作成するスクリプト | - |
 
 ## インストール
 
-[Releases](https://github.com/bellx2/hdmi-hotplug/releases) から最新版の `hdmi-hotplug.tar.gz` をダウンロードして展開し、インストールします。
+[Releases](https://github.com/bellx2/hdmi-hotplug/releases) から最新版の `hdmi-hotplug_all.deb` をダウンロードしてインストールします。
 Raspberry Pi 上で次のコマンドを実行してください。
 
 ```sh
-curl -fsSL -o hdmi-hotplug.tar.gz https://github.com/bellx2/hdmi-hotplug/releases/latest/download/hdmi-hotplug.tar.gz
-tar xzf hdmi-hotplug.tar.gz
-cd hdmi-hotplug
-./install.sh
+curl -fsSLO https://github.com/bellx2/hdmi-hotplug/releases/latest/download/hdmi-hotplug_all.deb
+sudo apt install ./hdmi-hotplug_all.deb
 ```
 
-特定のバージョンを使う場合は、URL の `latest/download` を `download/<タグ>`（例: `download/v1.0.0`）に置き換えます。
+依存パッケージ（`x11-xserver-utils` など）も自動でインストールされます。
+再起動は不要で、インストール直後から有効になります。
+アップデートも同じ手順で行えます。`/etc/default/hdmi-hotplug` の設定は引き継がれます。
 
-`sudo` 権限が必要です。再起動は不要で、インストール直後から有効になります。
+特定のバージョンを使う場合は、URL の `latest/download` を `download/<タグ>`（例: `download/v1.1.0`）に置き換えます。
+
+### tar.gz 版（v1.0.x）からの移行
+
+上の手順で deb をインストールすると、`install.sh` で入れた旧ファイル
+（`/usr/local/bin/hdmi-hotplug.sh` と `/etc/udev/rules.d/95-hdmi-hotplug.rules`）は自動で削除されます。
+`hdmi-hotplug.sh` に書き込んでいた設定は引き継がれないため、`/etc/default/hdmi-hotplug` に設定し直してください。
 
 ## アンインストール
 
-インストール時に展開した `hdmi-hotplug` ディレクトリで実行します。
-
 ```sh
-cd hdmi-hotplug
-./uninstall.sh
+sudo apt remove hdmi-hotplug   # 設定ファイルも消す場合は purge
 ```
 
 ## 動作の仕組み
@@ -70,16 +74,18 @@ DISPLAY=:0 xrandr | grep ' connected'
 
 ## カスタマイズ
 
-### 解像度を固定したい
+設定は `/etc/default/hdmi-hotplug` に書きます。変更は次回の HDMI 抜き差しから反映され、再インストールは不要です。
 
-`hdmi-hotplug.sh` の先頭にある設定欄で指定します。
+```sh
+sudo nano /etc/default/hdmi-hotplug
+```
+
+### 解像度を固定したい
 
 ```sh
 MODE="1920x1080"   # 空ならモニタの推奨解像度（自動）
 RATE="60"          # 空ならリフレッシュレートは指定しない
 ```
-
-書き換えたら `./install.sh` を実行し直してください。
 
 - 初期値は `MODE=""`（自動）です。4K モニタでは 3840x2160@30Hz になることがあります。
 - 指定できる値は `DISPLAY=:0 xrandr` で確認できます。
@@ -88,11 +94,11 @@ RATE="60"          # 空ならリフレッシュレートは指定しない
 
 ### ユーザーやディスプレイが違う場合
 
-`hdmi-hotplug.sh` の先頭にある次の 2 行を、環境に合わせて書き換えてください。
+次の 2 行を環境に合わせて書き換えてください。
 
 ```sh
-export DISPLAY=:0
-export XAUTHORITY=/home/pi/.Xauthority
+DISPLAY=:0
+XAUTHORITY=/home/pi/.Xauthority
 ```
 
 ## 注意事項
@@ -104,11 +110,18 @@ export XAUTHORITY=/home/pi/.Xauthority
 ## リリース手順
 
 `v` で始まるタグを push すると、GitHub Actions（`.github/workflows/release.yml`）が
-`hdmi-hotplug.tar.gz` を作成し、GitHub Releases に公開します。
-リリースノートには `CHANGELOG.md` のタグと同じ見出し（例: `## [v1.0.0] - 2026-11-24`）の節が使われます。
+`build-deb.sh` で `hdmi-hotplug_all.deb` を作成し、GitHub Releases に公開します。
+パッケージのバージョンはタグから先頭の `v` を除いた値（`v1.1.0` なら `1.1.0`）になります。
+リリースノートには `CHANGELOG.md` のタグと同じ見出し（例: `## [v1.1.0] - 2026-11-25`）の節が使われます。
 該当する節が無いとリリースは失敗するため、タグを付ける前に `CHANGELOG.md` へ追記してコミットしてください。
 
 ```sh
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+手元で deb を作る場合は、Debian 系の環境で次を実行します。
+
+```sh
+./build-deb.sh 1.1.0
 ```

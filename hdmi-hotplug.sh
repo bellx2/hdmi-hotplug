@@ -1,15 +1,13 @@
 #!/bin/sh
 # HDMI hotplug: adapt X display to connected monitor's resolution
 
-# ===== 設定 =====
-# 解像度を固定する場合は MODE を指定（例: 1920x1080）。空ならモニタの推奨解像度（自動）
+# 既定値。/etc/default/hdmi-hotplug で上書きする
 MODE=""
-# リフレッシュレート（例: 60）。空なら指定なし。MODE が空のときは無視される
 RATE=""
-# ================
-
-export DISPLAY=:0
-export XAUTHORITY=/home/pi/.Xauthority
+DISPLAY=:0
+XAUTHORITY=/home/pi/.Xauthority
+[ -r /etc/default/hdmi-hotplug ] && . /etc/default/hdmi-hotplug
+export DISPLAY XAUTHORITY
 
 sleep 2   # wait for EDID to be readable
 
